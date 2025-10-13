@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ServiceController extends Controller
 {
@@ -34,12 +35,27 @@ class ServiceController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        Service::create([
-            'name'  => $request->name,
-            'price' => $request->price,
-        ]);
+        try {
+            Service::create([
+                'name'  => $request->name,
+                'price' => $request->price,
+            ]);
 
-        return redirect()->route('services.index')->with('success', 'Service created successfully');
+            return redirect()->route('services.index')
+                ->withInput()
+                ->with([
+                    'message' => 'Layanan berhasil ditambahkan' ,
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with([
+                    'message' => 'Gagal menambahkan service: ' . $e->getMessage(),
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 
     /**
@@ -61,13 +77,28 @@ class ServiceController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        $service = Service::findOrFail($id);
-        $service->update([
-            'name'  => $request->name,
-            'price' => $request->price,
-        ]);
+        try {
+            $service = Service::findOrFail($id);
+            $service->update([
+                'name'  => $request->name,
+                'price' => $request->price,
+            ]);
 
-        return redirect()->route('services.index')->with('success', 'Service updated successfully');
+            return redirect()->route('services.index')
+                ->withInput()
+                ->with([
+                    'message' => 'Layanan berhasil diperbarui' ,
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with([
+                    'message' => 'Gagal memperbarui service: ' . $e->getMessage(),
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 
     /**
@@ -75,9 +106,22 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        $service = Service::findOrFail($id);
-        $service->delete();
+        try {
+            $service = Service::findOrFail($id);
+            $service->delete();
 
-        return redirect()->route('services.index')->with('success', 'Service deleted successfully');
+            return redirect()->route('services.index')
+                ->with([
+                    'message' => 'Layanan berhasil dihapus  ' ,
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with([
+                    'message' => 'Gagal menghapus Layanan : ' . $e->getMessage(),
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 }

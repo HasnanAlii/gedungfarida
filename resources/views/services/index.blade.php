@@ -28,8 +28,8 @@
                     <table class="w-full border-collapse text-sm rounded-lg overflow-hidden">
                         <thead>
                             <tr class="bg-gradient-to-r from-orange-200 to-orange-300 text-gray-800">
-                                <th class="p-3 border text-center font-semibold">#</th>
-                                <th class="p-3 border text-center font-semibold">Nama</th>
+                                <th class="p-3 border text-center font-semibold">No</th>
+                                <th class="p-3 border text-left font-semibold">Nama Layanan</th>
                                 <th class="p-3 border text-center font-semibold">Harga</th>
                                 <th class="p-3 border text-center font-semibold">Aksi</th>
                             </tr>
@@ -43,7 +43,7 @@
                                     </td>
 
                                     <!-- Nama -->
-                                    <td class="p-3 border text-center font-medium text-gray-800">
+                                    <td class="p-3 border text-left font-medium text-gray-800">
                                         {{ $service->name }}
                                     </td>
 

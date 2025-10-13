@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Hall;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class HallController extends Controller
 {
@@ -35,9 +36,24 @@ class HallController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        Hall::create($request->all());
+        try {
+            Hall::create($request->all());
 
-        return redirect()->route('halls.index')->with('success', 'Gedung berhasil ditambah.');
+            return redirect()->route('halls.index')
+                ->withInput()
+                ->with([
+                    'message' => 'Gedung berhasil ditambahkan pada ' . Carbon::now()->format('d M Y H:i'),
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with([
+                    'message' => 'Terjadi kesalahan saat menambah gedung: ' . $e->getMessage(),
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 
     /**
@@ -59,9 +75,24 @@ class HallController extends Controller
             'price' => 'required|numeric',
         ]);
 
-        $hall->update($request->all());
+        try {
+            $hall->update($request->all());
 
-        return redirect()->route('halls.index')->with('success', 'Gedung berhasil diperbarui.');
+            return redirect()->route('halls.index')
+                ->withInput()
+                ->with([
+                    'message' => 'Gedung berhasil diperbarui ' ,
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with([
+                    'message' => 'Gagal memperbarui gedung: ' . $e->getMessage(),
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 
     /**
@@ -69,8 +100,21 @@ class HallController extends Controller
      */
     public function destroy(Hall $hall)
     {
-        $hall->delete();
+        try {
+            $hall->delete();
 
-        return redirect()->route('halls.index')->with('success', 'Gedung berhasil dihapus.');
+            return redirect()->route('halls.index')
+                ->with([
+                    'message' => 'Gedung berhasil dihapus pada ' . Carbon::now()->format('d M Y H:i'),
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with([
+                    'message' => 'Gagal menghapus gedung: ' . $e->getMessage(),
+                    'alert-type' => 'error'
+                ]);
+        }
     }
 }

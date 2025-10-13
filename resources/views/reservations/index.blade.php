@@ -12,7 +12,7 @@
                 <!-- Tombol Tambah -->
                 <a href="{{ route('reservations.create') }}" 
                    class="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md font-semibold transition">
-                     ➕ Buat Reservasi
+                     ➕  Buat Reservasi
                 </a>
 
                 <!-- Table -->

@@ -19,11 +19,38 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
+    <!-- Tambahkan Flatpickr (modern datepicker ringan) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
 
     <!-- App CSS & JS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
 </head>
+<style>
+    .nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    color: white;
+    transition: all 0.2s ease;
+}
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+.nav-item.active {
+    background-color: white;
+    color: white;
+}
+
+</style>
 <body class="font-sans antialiased bg-gray-100">
     <div class="min-h-screen flex flex-col">
         {{-- Navigation --}}
@@ -39,7 +66,7 @@
         @endisset
 
         <!-- Page Content -->
-        <main class="flex-1 w-full">
+        <main class="flex-1 w-full bg-gradient-to-b from-gray-100 to-orange-100 ">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 {{ $slot }}
             </div>

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class HallAvailabilitiesController extends Controller
 {
     /**
-     * Display a listing of the resource (Calendar view).
+     * Menampilkan daftar ketersediaan gedung (tampilan kalender)
      */
     public function index()
     {
@@ -19,7 +19,8 @@ class HallAvailabilitiesController extends Controller
 
         return view('calendar.index', compact('dates'));
     }
-        public function indexx()
+
+    public function indexx()
     {
         $dates = HallAvailability::with(['hall', 'reservation.services'])
                     ->orderBy('date', 'asc')
@@ -29,7 +30,7 @@ class HallAvailabilitiesController extends Controller
     }
 
     /**
-     * Show the form for creating a new hall availability.
+     * Form untuk menambahkan ketersediaan gedung baru
      */
     public function create()
     {
@@ -38,7 +39,7 @@ class HallAvailabilitiesController extends Controller
     }
 
     /**
-     * Store a newly created hall availability in storage.
+     * Simpan data ketersediaan gedung baru
      */
     public function store(Request $request)
     {
@@ -62,19 +63,19 @@ class HallAvailabilitiesController extends Controller
             );
 
             return redirect()->route('calendar.index')->with([
-                'message' => 'Hall availability saved successfully.',
+                'message' => 'Data ketersediaan gedung berhasil disimpan.',
                 'alert-type' => 'success'
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with([
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
                 'alert-type' => 'error'
             ]);
         }
     }
 
     /**
-     * Show the form for editing the specified hall availability.
+     * Form untuk mengedit data ketersediaan gedung
      */
     public function edit(HallAvailability $calendar)
     {
@@ -83,7 +84,7 @@ class HallAvailabilitiesController extends Controller
     }
 
     /**
-     * Update the specified hall availability in storage.
+     * Perbarui data ketersediaan gedung
      */
     public function update(Request $request, HallAvailability $calendar)
     {
@@ -98,19 +99,19 @@ class HallAvailabilitiesController extends Controller
             $calendar->update($request->all());
 
             return redirect()->route('calendar.index')->with([
-                'message' => 'Hall availability updated successfully.',
+                'message' => 'Data ketersediaan gedung berhasil diperbarui.',
                 'alert-type' => 'success'
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with([
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage(),
                 'alert-type' => 'error'
             ]);
         }
     }
 
     /**
-     * Remove the specified hall availability from storage.
+     * Hapus data ketersediaan gedung
      */
     public function destroy(HallAvailability $calendar)
     {
@@ -118,12 +119,12 @@ class HallAvailabilitiesController extends Controller
             $calendar->delete();
 
             return redirect()->route('calendar.index')->with([
-                'message' => 'Hall availability deleted successfully.',
+                'message' => 'Data ketersediaan gedung berhasil dihapus.',
                 'alert-type' => 'success'
             ]);
         } catch (\Exception $e) {
             return redirect()->back()->with([
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage(),
                 'alert-type' => 'error'
             ]);
         }

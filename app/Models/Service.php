@@ -8,7 +8,7 @@ class Service extends Model
 {
     protected $fillable = [
         'name',
-        'price',
+        'price',''
     ];
 
     public function reservations()

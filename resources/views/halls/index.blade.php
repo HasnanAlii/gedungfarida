@@ -12,7 +12,7 @@
                 <div class="mb-4">
                     <a href="{{ route('halls.create') }}" 
                        class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition">
-                        ➕ Tambah Hall
+                        ➕ Tambah Gedung
                     </a>
                 </div>
 
@@ -21,7 +21,8 @@
                     <table class="w-full border-collapse text-sm rounded-lg overflow-hidden">
                         <thead>
                             <tr class="bg-gradient-to-r from-orange-200 to-orange-300 text-gray-800">
-                                <th class="p-3 border text-center font-semibold">Nama</th>
+                                  <th class="p-3 border text-center font-semibold">No</th>
+                                <th class="p-3 border text-left font-semibold">Nama Gedung</th>
                                 <th class="p-3 border text-center font-semibold">Kapasitas</th>
                                 <th class="p-3 border text-center font-semibold">Harga</th>
                                 <th class="p-3 border text-center font-semibold">Aksi</th>
@@ -30,8 +31,11 @@
                         <tbody class="divide-y divide-gray-200">
                             @forelse($halls as $hall)
                                 <tr class="hover:bg-gray-50 transition">
+                                     <td class="p-3 border text-center text-gray-700">
+                                        {{ $loop->iteration }}
+                                    </td>
                                     <!-- Nama -->
-                                    <td class="p-3 border text-gray-700 text-center">
+                                    <td class="p-3 border text-gray-700 text-left">
                                         {{ $hall->name }}
                                     </td>
 

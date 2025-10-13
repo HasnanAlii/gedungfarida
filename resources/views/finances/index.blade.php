@@ -20,14 +20,7 @@
                              <a href="{{ route('finances.pdf') }}" 
                              class="px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded shadow">
                                 🖨️ Cetak PDF
-                            </a>     <a href="{{ route('finances.pdf') }}" 
-                  
-                        🖨️ Cetak PDF
-                    </a>
-
-
-
-
+                            </a>
                     </div>
                
                     <!-- Modal -->

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-            {{ __('📅 Jadwal Gedung') }}
+            {{ __(' Jadwal Gedung') }}
         </h2>
     </x-slot>
 

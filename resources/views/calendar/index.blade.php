@@ -14,10 +14,10 @@
                         <thead>
                             <tr class="bg-gradient-to-r from-orange-200 to-orange-300 text-gray-800">
                                 <th class="px-4 py-3 border text-center font-semibold">Penyewa</th>
-                                <th class="px-4 py-3 border text-center font-semibold">Hall</th>
-                                <th class="px-4 py-3 border text-center font-semibold">Tanggal Sewa</th>
+                                {{-- <th class="px-4 py-3 border text-center font-semibold">Hall</th> --}}
                                 <th class="px-4 py-3 border text-center font-semibold">Catering</th>
                                 <th class="px-4 py-3 border text-center font-semibold">Keterangan</th>
+                                <th class="px-4 py-3 border text-center font-semibold">Tanggal Sewa</th>
                                 <th class="px-4 py-3 border text-center font-semibold">Aksi</th>
                             </tr>
                         </thead>
@@ -32,40 +32,40 @@
                                         {{ optional($reservation)->renter_name ?? '-' }}
                                     </td>
 
-                                    <!-- Hall -->
+                                    {{-- <!-- Hall -->
                                     <td class="px-4 py-3 border text-center font-semibold text-gray-800">
                                         {{ $calendar->hall->name ?? '-' }}
-                                    </td>
-
-                                    <!-- Tanggal -->
-                                    <td class="px-4 py-3 border text-center text-gray-600">
-                                        @if($reservation)
-                                            {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }}
-                                            -
-                                            {{ \Carbon\Carbon::parse($reservation->event_end)->format('d M Y') }}
-                                        @else
-                                            <span class="italic text-gray-400">-</span>
-                                        @endif
-                                    </td>
-
+                                    </td> --}}
+                                    
                                     <!-- Catering -->
                                     <td class="px-4 py-3 border text-center">
                                         @if($reservation && $reservation->services->isNotEmpty())
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 shadow-sm">
-                                                {{ $reservation->services->map(fn($s) => $s->name . ' x ' . $s->pivot->quantity)->implode(', ') }}
-                                            </span>
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 shadow-sm">
+                                            {{ $reservation->services->map(fn($s) => $s->name . ' x ' . $s->pivot->quantity)->implode(', ') }}
+                                        </span>
                                         @elseif($reservation)
-                                            <span class="text-gray-500 italic">Tidak ada service</span>
+                                        <span class="text-gray-500 italic">Tidak menggunakan catering</span>
                                         @else
-                                            <span class="text-gray-400 italic">Tidak ada reservasi</span>
+                                        <span class="text-gray-400 italic">Tidak ada reservasi</span>
                                         @endif
                                     </td>
-
+                                    
                                     <!-- Keterangan -->
                                     <td class="px-4 py-3 border text-gray-600 text-center">
                                         {{ $calendar->note ?? '-' }}
                                     </td>
-
+                                    
+                                    <!-- Tanggal -->
+                                    <td class="px-4 py-3 border text-center text-gray-600">
+                                    @if($reservation)
+                                        {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }}
+                                            -
+                                        {{ \Carbon\Carbon::parse($reservation->event_end)->format('d M Y') }}
+                                     @else
+                                        <span class="italic text-gray-400">-</span>
+                                    @endif
+                                    </td>      
+                                                                            
                                     <!-- Action -->
                                     <td class="px-4 py-3 border text-center">
                                         <form action="{{ route('calendar.destroy', $calendar->id) }}" 
