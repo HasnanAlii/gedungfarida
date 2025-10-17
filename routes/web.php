@@ -66,8 +66,9 @@ Route::get('/finances/create', [FinanceController::class, 'create'])->name('fina
 Route::post('/finances', [FinanceController::class, 'store'])->name('finances.store');
 Route::get('/finances/{id}/edit', [FinanceController::class, 'edit'])->name('finances.edit');
 Route::put('/finances/{id}', [FinanceController::class, 'update'])->name('finances.update');
-Route::delete('/finances/{id}', [FinanceController::class, 'destroy'])->name('finances.destroy');
-Route::get('/finances/pdf', [App\Http\Controllers\FinanceController::class, 'exportPdf'])->name('finances.pdf');
+Route::get('/finances/pdf', [FinanceController::class, 'exportPdf'])->name('finances.pdf');
+Route::delete('/finances/delete-old', [FinanceController::class, 'deleteOld'])->name('finances.deleteOld');
+
 
 
 /**
