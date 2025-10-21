@@ -1,12 +1,27 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-            {{ __(' Dashboard Admin ') }}
-        </h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
+                {{ __('Dashboard Admin') }}
+            </h2>
+
+            <!-- Tombol Hapus Data Lama -->
+            <form action="{{ route('admin.cleanup.olddata') }}" method="POST"
+                onsubmit="return confirm('Apakah kamu yakin ingin menghapus data yang lebih dari 2 bulan?')"
+                class="flex justify-end">
+                @csrf
+                <button type="submit"
+                    class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 sm:px-5 sm:py-2 rounded-lg text-sm font-medium shadow transition-all active:scale-95">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Hapus Data Lama</span>
+                </button>
+            </form>
+        </div>
     </x-slot>
 
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+       
 
             <!-- Card Statistik -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

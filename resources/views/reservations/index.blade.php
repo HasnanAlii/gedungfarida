@@ -1,129 +1,142 @@
+                
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-            {{ __(' Daftar Reservasi') }}
-        </h2>
-    </x-slot>
+        <div class="flex justify-between items-center">
+            <!-- Judul -->
+            <h2 class="text-xl font-semibold text-gray-800 text-left sm:text-2xl">
+                {{ __('Reservasi') }}
+            </h2>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-lg sm:rounded-xl p-6">
+            <!-- Tombol Menu Reservasi -->
+            <a href="{{ route('payments.index') }}" 
+            class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold
+                    text-xs py-1 px-2 rounded-lg transition w-auto sm:text-sm sm:py-2 sm:px-4">
+                Menu Pembayaran
+                <!-- Feather icon: arrow-right -->
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    class="ml-1 h-3 w-3 sm:ml-2 sm:h-5 sm:w-5" 
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+
+
+
+
+</x-slot>
+<div class="container mx-auto py-2">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-2">
+        <h2 class="text-md font-bold text-left sm:text-left sm:text-2xl"> Daftar Reservasi</h2>
+
+        <a href="{{ route('reservations.create') }}" 
+        class="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white px-5 text-sm  sm:text-xl py-2 rounded-lg shadow-md font-semibold transition">
+        <!-- Feather icon: plus -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Buat Reservasi
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach ($reservations as $reservation)
+                @php
+                    $statusLabels = [
+                        'confirmed' => ['label' => '💰 Menunggu Bayar', 'class' => 'bg-yellow-100 text-yellow-800'],
+                        'completed' => ['label' => '✅ Sukses', 'class' => 'bg-green-100 text-green-800'],
+                        'pending'   => ['label' => '⏳ Menunggu Konfirmasi', 'class' => 'bg-blue-100 text-blue-800'],
+                        'canceled'  => ['label' => '❌ Dibatalkan', 'class' => 'bg-red-100 text-red-800'],
+                    ];
+                    $status = $statusLabels[$reservation->status] ?? ['label' => ucfirst($reservation->status), 'class' => 'bg-gray-100 text-gray-800'];
+                @endphp
+
+                <div class="bg-white rounded-xl shadow p-4 flex flex-col justify-between hover:scale-105 transition-transform duration-200">
+                    
+                    {{-- Ringkas info --}}
+                    <div class="text-center mb-2">
+                        <h3 class="text-lg font-bold mb-1">Reservasi ID {{ $reservation->id }}</h3>
+                        <p class="text-sm text-gray-600 mb-1">
+                            {{ $reservation->event_start->format('d M') }} – {{ $reservation->event_end->format('d M') }}
+                        </p>
+                        <p class="text-sm text-gray-500 truncate mb-1">
+                            @if($reservation->services->count())
+                            {{ $reservation->services->pluck('name')->implode(', ') }}
+                            @else
+                            <span class="italic">Tanpa catering</span>
+                            @endif
+                        </p>
+                        <p class="text-sm font-semibold">Rp {{ number_format($reservation->total_price,0,',','.') }}</p>
+                    </div>
+                    
+                    {{-- Status --}}
+                    <div class="text-center mb-2">
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $status['class'] }}">
+                            {{ $status['label'] }}
+                        </span>
+                    </div>
+
+                    {{-- Toggle Detail --}}
+                        @hasrole('admin')
+                        <button class="bg-blue-50 text-blue-700 text-sm py-1 px-2 rounded-full hover:bg-blue-100 transition mb-2" 
+                        onclick="this.nextElementSibling.classList.toggle('hidden')">
+                        Lihat Detail ▼
+                         </button>
                 
-                <!-- Tombol Tambah -->
-                <a href="{{ route('reservations.create') }}" 
-                   class="bg-blue-500 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md font-semibold transition">
-                     ➕  Buat Reservasi
-                </a>
 
-                <!-- Table -->
-                <div class="mt-6 overflow-x-auto">
-                    <table class="w-full border-collapse rounded-xl overflow-hidden shadow-sm">
-                        <thead>
-                            <tr class="bg-gradient-to-r from-orange-200 to-orange-300 text-gray-800">
-                                 <th class="px-4 py-3 border text-center font-semibold">ID Reservasi </th>
-                                @hasrole('admin')
-                                <th class="px-4 py-3 border text-left font-semibold">Penyewa</th>
-                                @endhasrole
-                                <th class="p-3 text-center text-sm font-semibold border">Tanggal Sewa</th>
-                                <th class="p-3 text-left text-sm font-semibold border">Layanan Tambahan</th>
-                                <th class="p-3 text-center text-sm font-semibold border">Total</th>
-                                <th class="p-3 text-center text-sm font-semibold border">Status</th>
-                                <th class="p-3 text-center text-sm font-semibold border">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach($reservations as $reservation)
-                                <tr class="hover:bg-gray-50 transition">
-                                       <td class="px-4 py-3 border text-gray-700 text-center">{{ $reservation->id}}</td>
-                                    <!-- Customer -->
-                                     @hasrole('admin')
-                                    <td class="p-3 border text-gray-700">
-                                        {{ $reservation->renter_name }}
-                                    </td>
-                                     @endhasrole
+                         <div class="hidden text-sm text-gray-700 mb-2 space-y-1">
+                            <p>Penyewa: {{ $reservation->renter_name }}</p>
+                            <ul class="list-disc list-inside">
+                                @foreach($reservation->services as $service)
+                                <li>{{ $service->name }} x {{ $service->pivot->quantity }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endhasrole
 
-                                    
+                                                {{-- Aksi --}}
+                            <div class="flex justify-center gap-2 mt-2 flex-wrap">
 
-                                    <!-- Tanggal -->
-                                    <td class="p-3 border text-center text-gray-600">
-                                        {{ $reservation->event_start->format('d M Y') }} – 
-                                        {{ $reservation->event_end->format('d M Y') }}
-                                    </td>
+                                <!-- Tombol Edit -->
+                                <a href="{{ route('reservations.edit', $reservation->id) }}"
+                                class="bg-green-100 text-green-800 rounded-full px-2 py-1 text-xs hover:bg-green-200 transition">
+                                ✏️
+                                </a>
 
-                                    <!-- Catering -->
-                                    <td class="p-3 border text-gray-700">
-                                        @if($reservation->services->count() > 0)
-                                            <ul class="list-disc pl-4 text-sm text-gray-600">
-                                                @foreach($reservation->services as $service)
-                                                    <li>{{ $service->name }} x {{ $service->pivot->quantity }}</li>
-                                                @endforeach
-                                            </ul>
-                                        @else
-                                            <span class="text-gray-400 italic">-</span>
-                                        @endif
-                                    </td>
+                                <!-- Tombol Hapus -->
+                                <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST"
+                                    onsubmit="return confirm('Hapus reservasi ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="bg-red-100 text-red-800 rounded-full px-2 py-1 text-xs hover:bg-red-200 transition">
+                                        🗑️
+                                    </button>
+                                </form>
 
-                                    <!-- Total -->
-                                    <td class="p-3 border text-center font-semibold text-gray-800">
-                                        Rp {{ number_format($reservation->total_price,0,',','.') }}
-                                    </td>
+                                <!-- Tombol Konfirmasi (Admin Only) -->
+                                @if(Auth::user()->hasRole('admin') && $reservation->status === 'pending')
+                                    <form action="{{ route('reservations.konfirmasi', $reservation->id) }}" 
+                                        method="POST" class="inline-block"
+                                        onsubmit="return confirm('Konfirmasi reservasi ini?')">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" 
+                                                class="bg-green-100 text-green-800 rounded-full px-2 py-1 text-xs hover:bg-green-200 transition">
+                                            Konfirmasi
+                                        </button>
+                                    </form>
+                                @endif
 
-                                    <!-- Status -->
-                                    @php
-                                        $statusLabels = [
-                                            'confirmed' => ['label' => 'Menunggu Pembayaran', 'class' => 'bg-yellow-100 text-yellow-800'],
-                                            'completed' => ['label' => 'Reservasi Sukses', 'class' => 'bg-green-100 text-green-800'],
-                                            'pending'   => ['label' => 'Menunggu Dikonfirmasi', 'class' => 'bg-blue-100 text-blue-800'],
-                                            'canceled'  => ['label' => 'Dibatalkan', 'class' => 'bg-red-100 text-red-800'],
-                                        ];
-                                        $status = $statusLabels[$reservation->status] ?? ['label' => ucfirst($reservation->status), 'class' => 'bg-gray-100 text-gray-800'];
-                                    @endphp
+                            </div>
 
-                                    <td class="p-3 border text-center">
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm {{ $status['class'] }}">
-                                            {{ $status['label'] }}
-                                        </span>
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="p-3 border text-center space-x-2">
-                                        <!-- Edit -->
-                                        <a href="{{ route('reservations.edit', $reservation->id) }}" 
-                                           class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs shadow transition">
-                                            ✏️ Edit
-                                        </a>
-
-                                        <!-- Delete -->
-                                        <form action="{{ route('reservations.destroy', $reservation->id) }}" 
-                                              method="POST" class="inline-block"
-                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus reservasi ini?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" 
-                                                    class="inline-flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs shadow transition">
-                                                🗑️ Delete
-                                            </button>
-                                        </form>
-
-                                        <!-- Konfirmasi (Admin Only) -->
-                                        @if(Auth::user()->hasRole('admin') && $reservation->status === 'pending')
-                                            <form action="{{ route('reservations.konfirmasi', $reservation->id) }}" 
-                                                  method="POST" class="inline-block"
-                                                  onsubmit="return confirm('Konfirmasi reservasi ini?')">
-                                                @csrf @method('PUT')
-                                                <button type="submit" 
-                                                        class="inline-flex items-center bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs shadow transition">
-                                                    ✅ Konfirmasi
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
+            @endforeach
+        </div>
 
-            </div>
+        {{-- Pagination --}}
+        <div class="mt-6 flex justify-center">
+            {{ $reservations->links() }}
         </div>
     </div>
 </x-app-layout>

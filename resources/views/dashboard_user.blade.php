@@ -1,12 +1,27 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-            {{ __(' Dashboard ') }}
+        <h2 class="text-xl font-semibold text-gray-800 text-left sm:text-2xl">
+            {{ __('Dashboard Saya') }}
         </h2>
     </x-slot>
 
-    <div class="py-10">
+    <div class="py-1">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+            <!-- Alert Selamat Datang -->
+            <div id="welcome-alert" 
+                 class="flex items-start justify-between bg-gradient-to-r from-orange-400 to-orange-500 text-white p-4 rounded-xl shadow-md mb-6 relative">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold">👋 Selamat Datang, {{ Auth::user()->name ?? 'Pengguna' }}!</h3>
+                    <p class="text-sm text-orange-100 mt-1">
+                        Senang melihatmu kembali. Lihat status reservasi dan pembayaranmu di bawah ini.
+                    </p>
+                </div>
+                <button onclick="document.getElementById('welcome-alert').classList.add('hidden')" 
+                        class="text-white hover:text-orange-200 ml-4 text-2xl leading-none">
+                    &times;
+                </button>
+            </div>
 
             <!-- Card Info User -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -50,17 +65,10 @@
                         <tbody class="divide-y divide-gray-200">
                             @forelse ($myReservations as $reservation)
                                 <tr class="hover:bg-orange-50 transition">
-                                    <!-- No -->
-                                    <td class="p-3 border text-gray-700">
-                                        {{ $loop->iteration }}
-                                    </td>
-
-                                    <!-- Tanggal -->
+                                    <td class="p-3 border text-gray-700">{{ $loop->iteration }}</td>
                                     <td class="p-3 border text-center text-gray-600">
                                         {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }}
                                     </td>
-
-                                    <!-- Status -->
                                     <td class="p-3 border text-center">
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm
                                             @if($reservation->status == 'completed') bg-green-100 text-green-700

@@ -10,17 +10,15 @@ class CreateHallAvailabilitiesTable extends Migration
     {
         Schema::create('hall_availabilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hall_id')->constrained()->cascadeOnDelete();
-            
-            // Tambah reservation_id (nullable, karena kadang hanya untuk maintenance atau available)
+            $table->foreignId('hall_id')->constrained()->cascadeOnDelete();  
             $table->foreignId('reservation_id')->nullable()->constrained()->cascadeOnDelete();
-
-            $table->date('date'); // tanggal tertentu
+            $table->date('date'); 
+            $table->date('date_end' ); 
             $table->enum('status', ['available', 'unavailable'])->default('available');
-            $table->string('note')->nullable(); // alasan (misalnya "dipakai", "maintenance")
+            $table->string('note')->nullable(); 
             $table->timestamps();
 
-            $table->unique(['hall_id', 'date']); // satu hall hanya punya 1 status per hari
+            $table->unique(['hall_id', 'date']); 
         });
     }
 

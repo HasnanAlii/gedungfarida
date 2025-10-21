@@ -58,6 +58,8 @@ Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])->
 Route::put('/reservations/{id}/konfirmasi', [ReservationController::class, 'konfirmasi'])
      ->name('reservations.konfirmasi');
 
+
+Route::post('/admin/cleanup-old-data', [ReservationController::class, 'cleanupOldData'])->name('admin.cleanup.olddata');
 /**
  * Finance Routes
  */

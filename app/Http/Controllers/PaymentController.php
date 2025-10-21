@@ -141,9 +141,10 @@ public function receipt(Payment $payment)
     HallAvailability::create([
         'hall_id'        => $hall_id,
         'date'           => $reservation->event_start,
+        'date_end'           => $reservation->event_end,
         'reservation_id' => $reservation->id,
         'status'         => 'unavailable',
-        'note'           => 'Dipakai reservasi #' . $reservation->id,
+        'note'           => 'Gedung disewa ' . $reservation->renter_name ,
     ]);
 
     return redirect()->route('payments.index')

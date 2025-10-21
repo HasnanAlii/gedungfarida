@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-gray-800 leading-tight text-center sm:text-left">
+         <h2 class="text-xl font-semibold text-gray-800 text-left sm:text-2xl">
             {{ __('Edit Reservasi') }}
         </h2>
     </x-slot>

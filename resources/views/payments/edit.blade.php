@@ -1,7 +1,7 @@
 {{-- resources/views/payments/edit.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-2xl text-orange-600 leading-tight flex items-center space-x-2">
+         <h2 class="text-xl font-semibold text-gray-800 text-left sm:text-2xl">
             <span>{{ __(' Pembayaran') }}</span>
         </h2>
     </x-slot>

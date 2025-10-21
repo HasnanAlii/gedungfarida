@@ -9,6 +9,7 @@ use App\Models\HallAvailability;
 use App\Models\Payment;
 use App\Models\Service;
 use App\Models\ReservationService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,6 +36,26 @@ class ReservationController extends Controller
 
             return view('reservations.index', compact('reservations'));
         }
+    }
+    public function cleanupOldData()
+    {
+        $threshold = Carbon::now()->subMonths(2);
+
+        // Hitung total sebelum dihapus
+        $oldReservations = Reservation::where('event_end', '<', $threshold)->count();
+        $oldPayments = Payment::where('payment_date', '<', $threshold)->count();
+        $oldHalls = HallAvailability::where('date_end', '<', $threshold)->count();
+
+        // Hapus data lama
+        Reservation::where('event_end', '<', $threshold)->delete();
+        Payment::where('payment_date', '<', $threshold)->delete();
+        HallAvailability::where('date_end', '<', $threshold)->delete();
+
+        // Kirim pesan ke session
+        return redirect()->back()->with([
+        'message' => 'Data Lebih Dari 2 bulan lalu berhasil dihapus.',
+        'alert-type' => 'success'
+    ]);
     }
 
 
@@ -63,62 +84,65 @@ class ReservationController extends Controller
             'services.*.quantity'   => 'required|integer|min:1',
         ]);
 
-        try {
-            // Cek apakah hall tersedia
-            $existing = HallAvailability::where('hall_id', $request->hall_id)
-                ->whereBetween('date', [$request->event_start, $request->event_end])
-                ->first();
+      try {
+    // Ubah format tanggal dari d-m-Y → Y-m-d agar bisa dibandingkan di database
+    $eventStart = \Carbon\Carbon::createFromFormat('d-m-Y', $request->event_start)->format('Y-m-d');
+    $eventEnd   = \Carbon\Carbon::createFromFormat('d-m-Y', $request->event_end)->format('Y-m-d');
 
-            if ($existing) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with([
-                        'message' => 'Gedung tidak tersedia pada tanggal ' . \Carbon\Carbon::parse($existing->date)->format('d M Y'),
-                        'alert-type' => 'error'
-                    ]);
-            }
+    // Cek apakah hall sedang digunakan
+    $existing = HallAvailability::where('hall_id', $request->hall_id)
+        ->where('status', 'unavailable')
+        ->where(function ($query) use ($eventStart, $eventEnd) {
+            $query->whereBetween('date', [$eventStart, $eventEnd])
+                ->orWhereBetween('date_end', [$eventStart, $eventEnd])
+                ->orWhere(function ($query) use ($eventStart, $eventEnd) {
+                    $query->where('date', '<=', $eventStart)
+                          ->where('date_end', '>=', $eventEnd);
+                });
+        })
+        ->first();
 
-            // Simpan reservasi
-            $reservation = Reservation::create([
-                'renter_name'     => $request->renter_name ?: Auth::user()->name,
-                'user_id'         => $request->user_id,
-                'hall_id'         => $request->hall_id,
-                'reservation_date'=> now(),
-                'event_start'     => $request->event_start,
-                'event_end'       => $request->event_end,
-                'total_price'     => $request->total_price,
-                'status'          => $request->status,
-            ]);
-
-
-            if ($request->has('services')) {
-                foreach ($request->services as $srv) {
-                    $service = Service::find($srv['service_id']);
-                    if ($service) {
-                        ReservationService::create([
-                            'reservation_id' => $reservation->id,
-                            'service_id'     => $service->id,
-                            'quantity'       => $srv['quantity'],
-                            'total_price'    => $service->price * $srv['quantity'],
-                        ]);
-                    }
-                }
-            }
-
-        
-
-            return redirect()->route('reservations.index')
-                             ->with([
-                                'message' => 'Reservasi berhasil dibuat, Mohon tunggu Admin melakukan konfirmasi.',
-                                'alert-type' => 'success'
-                             ]);
-
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with([
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+    if ($existing) {
+        return redirect()->back()
+            ->withInput()
+            ->with([
+                'message' => 'Gedung tidak tersedia pada rentang ' .
+                    \Carbon\Carbon::parse($existing->date)->format('d M Y') .
+                    ' - ' .
+                    \Carbon\Carbon::parse($existing->date_end)->format('d M Y'),
                 'alert-type' => 'error'
             ]);
-        }
+    }
+
+    // Lanjut simpan data reservasi jika tersedia
+    $reservation = Reservation::create([
+        'renter_name'      => $request->renter_name ?: Auth::user()->name,
+        'user_id'          => $request->user_id,
+        'hall_id'          => $request->hall_id,
+        'reservation_date' => now(),
+        'event_start'      => $eventStart,
+        'event_end'        => $eventEnd,
+        'total_price'      => $request->total_price,
+        'status'           => $request->status,
+    ]);
+
+
+
+    return redirect()->route('reservations.index')->with([
+        'message' => 'Reservasi berhasil dibuat. Mohon tunggu Admin melakukan konfirmasi.',
+        'alert-type' => 'success'
+    ]);
+
+} catch (\Exception $e) {
+    return redirect()->back()
+        ->withInput()
+        ->with([
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            'alert-type' => 'error'
+        ]);
+}
+
+
     }
             public function konfirmasi($id)
         {

@@ -9,6 +9,7 @@ class HallAvailability extends Model
     protected $fillable = [
         'hall_id',
         'date',
+        'date_end',
         'status',
         'note',
         'reservation_id'
