@@ -11,22 +11,10 @@ class HallSeeder extends Seeder
     {
         Hall::insert([
             [
-                'name' => 'Grand Ballroom',
-                'description' => 'Gedung besar untuk 1000 tamu.',
-                'capacity' => 1000,
-                'price' => 50000000,
-            ],
-            [
-                'name' => 'VIP Hall',
-                'description' => 'Hall eksklusif untuk 300 tamu.',
-                'capacity' => 300,
-                'price' => 20000000,
-            ],
-            [
-                'name' => 'Outdoor Garden',
-                'description' => 'Area taman terbuka untuk 500 tamu.',
-                'capacity' => 500,
-                'price' => 30000000,
+                'name' => 'Gedung Farida',
+                'description' => 'Gedung untuk 150 tamu.',
+                'capacity' => 150,
+                'price' => 5300000,
             ],
         ]);
     }

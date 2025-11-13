@@ -37,6 +37,21 @@ class ReservationController extends Controller
             return view('reservations.index', compact('reservations'));
         }
     }
+    public function show($id)
+    {
+        $user = Auth::user();
+        
+        // Muat semua relasi yang mungkin
+        $reservation = Reservation::with(['user', 'hall', 'services', 'payments'])
+            ->findOrFail($id);
+
+        // Otorisasi: Admin boleh lihat semua, customer hanya boleh lihat miliknya
+        if (!$user->hasRole('admin') && $reservation->user_id !== $user->id) {
+            abort(403, 'Anda tidak diizinkan mengakses halaman ini.');
+        }
+
+        return view('reservations.show', compact('reservation'));
+    }
     public function cleanupOldData()
     {
         $threshold = Carbon::now()->subMonths(2);

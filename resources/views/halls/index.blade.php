@@ -7,78 +7,85 @@
 
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-lg rounded-xl p-6">
-                <!-- Tombol Tambah -->
-                <div class="mb-4">
-                    <a href="{{ route('halls.create') }}" 
-                       class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition">
-                        ➕ Tambah Gedung
-                    </a>
-                </div>
-
-                <!-- Tabel Halls -->
-                <div class="overflow-x-auto">
-                    <table class="w-full border-collapse text-sm rounded-lg overflow-hidden">
-                        <thead>
-                            <tr class="bg-gradient-to-r from-orange-200 to-orange-300 text-gray-800">
-                                  <th class="p-3 border text-center font-semibold">No</th>
-                                <th class="p-3 border text-left font-semibold">Nama Gedung</th>
-                                <th class="p-3 border text-center font-semibold">Kapasitas</th>
-                                <th class="p-3 border text-center font-semibold">Harga</th>
-                                <th class="p-3 border text-center font-semibold">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @forelse($halls as $hall)
-                                <tr class="hover:bg-gray-50 transition">
-                                     <td class="p-3 border text-center text-gray-700">
-                                        {{ $loop->iteration }}
-                                    </td>
-                                    <!-- Nama -->
-                                    <td class="p-3 border text-gray-700 text-left">
-                                        {{ $hall->name }}
-                                    </td>
-
-                                    <!-- Kapasitas -->
-                                    <td class="p-3 border text-center font-medium text-gray-700">
-                                        {{ $hall->capacity }} Orang
-                                    </td>
-
-                                    <!-- Harga -->
-                                    <td class="p-3 border text-center font-semibold text-gray-800">
-                                        Rp {{ number_format($hall->price,0,',','.') }}
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="p-3 border text-center space-x-2">
-                                        <a href="{{ route('halls.edit', $hall->id) }}" 
-                                           class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs shadow transition">
-                                            ✏️ Edit
-                                        </a>
-
-                                        <form action="{{ route('halls.destroy', $hall->id) }}" 
-                                              method="POST" class="inline-block"
-                                              onsubmit="return confirm('Yakin ingin menghapus hall ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs shadow transition">
-                                                🗑️ Hapus
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="p-4 text-center text-gray-500 italic">
-                                        Belum ada data hall yang tersedia.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+            
+            <div class="mb-6">
+                <a href="{{ route('halls.create') }}" 
+                   class="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-lg shadow-lg font-semibold transition">
+                    <i data-feather="plus" class="w-5 h-5"></i>
+                    <span>Tambah Gedung</span>
+                </a>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                @forelse($halls as $hall)
+                    <div class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                        
+                        <div class="h-40 bg-gray-50 flex items-center justify-center">
+                            {{-- 
+                                GANTI DENGAN GAMBAR ANDA:
+                                Jika Anda punya field gambar (misal: $hall->image)
+                                <img src="{{ asset('storage/'_ . $hall->image) }}" alt="{{ $hall->name }}" class="w-full h-full object-cover">
+                            --}}
+                            <i data-feather="home"  class="w-16 h-16 text-orange-300"></i>
+                        </div>
+
+                        <div class="p-6 flex-grow">
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $hall->name }}</h3>
+                            
+                            <div class="mb-4">
+                                <p class="text-xs text-gray-500">Harga Sewa</p>
+                                <p class="text-3xl font-bold text-orange-600">
+                                    Rp {{ number_format($hall->price,0,',','.') }}
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-2 text-gray-600">
+                                <i data-feather="users" class="w-5 h-5 text-gray-400"></i>
+                                <span class="font-medium">{{ $hall->capacity }} Orang</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-4 border-t border-gray-100">
+                            <div class="flex justify-end gap-2">
+                                <a href="{{ route('halls.edit', $hall->id) }}" 
+                                   class="inline-flex items-center gap-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1.5 rounded-md text-xs font-medium transition">
+                                    <i data-feather="edit-2" class="w-4 h-4"></i>
+                                    Edit
+                                </a>
+
+                                <form action="{{ route('halls.destroy', $hall->id) }}" 
+                                      method="POST" class="inline-block"
+                                      onsubmit="return confirm('Yakin ingin menghapus hall ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" 
+                                            class="inline-flex items-center gap-1.5 bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1.5 rounded-md text-xs font-medium transition">
+                                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="md:col-span-2 lg:col-span-3 bg-white shadow-lg rounded-xl p-12 text-center text-gray-500">
+                        <i data-feather="box" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-700">Belum Ada Gedung</h3>
+                        <p class="mt-2">Klik tombol "Tambah Gedung" untuk mulai menambahkan data.</p>
+                    </div>
+                @endforelse
+            </div>
+
         </div>
     </div>
+    
+    {{-- Script untuk menjalankan Feather Icons --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                feather.replace();
+            });
+        </script>
+    @endpush
 </x-app-layout>

@@ -99,7 +99,7 @@
                     </div>
 
                     {{-- Status (Admin Saja) --}}
-                    @if(Auth::user()->hasRole('admin'))
+                    {{-- @if(Auth::user()->hasRole('admin'))
                         <div>
                             <label class="block text-gray-700 font-medium mb-2">Status</label>
                             <select name="status"
@@ -110,9 +110,9 @@
                                 <option value="canceled">Dibatalkan</option>
                             </select>
                         </div>
-                    @else
+                    @else --}}
                         <input type="hidden" name="status" value="pending">
-                    @endif
+                    {{-- @endif --}}
 
                     {{-- Tombol --}}
                     {{-- <div class="flex flex-col sm:flex-row justify-end items-center gap-3 pt-6"> --}}

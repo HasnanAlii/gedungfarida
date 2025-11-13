@@ -15,16 +15,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth'])
     ->name('dashboard');
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
 /**
  * Hall Routes
@@ -53,6 +52,7 @@ Route::get('/reservations', [ReservationController::class, 'index'])->name('rese
 Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 Route::get('/reservations/{id}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
+Route::get('/reservations/{id}/', [ReservationController::class, 'show'])->name('reservations.show');
 Route::put('/reservations/{id}', [ReservationController::class, 'update'])->name('reservations.update');
 Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 Route::put('/reservations/{id}/konfirmasi', [ReservationController::class, 'konfirmasi'])
@@ -95,6 +95,7 @@ Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])
 Route::put('/payments/{payment}/konfirmasi', [PaymentController::class, 'konfirmasi'])
      ->name('payments.konfirmasi');
 
+});
 
 
 require __DIR__.'/auth.php';

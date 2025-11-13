@@ -12,149 +12,163 @@ use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
 {
+    /**
+     * Menampilkan daftar pembayaran
+     */
     public function index()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user->hasRole('admin')) {
-        // Admin: tampilkan semua pembayaran
-        $payments = Payment::with('reservation.user')
-            ->orderBy('payment_date', 'desc')
-            ->paginate(10);
+        if ($user->hasRole('admin')) {
+            // Admin: tampilkan semua pembayaran
+            $payments = Payment::with('reservation.user')
+                ->orderBy('payment_date', 'desc')
+                ->paginate(10);
 
-        return view('payments.index', compact('payments'));
-    } else {
-        // User: hanya tampilkan pembayaran miliknya
-        $payments = Payment::with('reservation.hall')
-            ->whereHas('reservation', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
-            })
-            ->orderBy('payment_date', 'desc')
-            ->paginate(10);
+            return view('payments.index', compact('payments'));
 
-        return view('payments.index', compact('payments'));
+        } else {
+            // User biasa: tampilkan hanya pembayaran miliknya
+            $payments = Payment::with('reservation.hall')
+                ->whereHas('reservation', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->orderBy('payment_date', 'desc')
+                ->paginate(10);
+
+            return view('payments.index', compact('payments'));
         }
     }
 
-  
-
+    /**
+     * Menampilkan form edit pembayaran
+     */
     public function edit(Payment $payment)
     {
         $reservations = Reservation::all();
         return view('payments.edit', compact('payment', 'reservations'));
     }
 
-public function update(Request $request, Payment $payment)
-{
-    $request->validate([
-        'reservation_id' => 'required|exists:reservations,id',
-        'amount' => 'required|numeric|min:0',
-        'method' => 'required|in:cash,transfer',
-        'payment_date' => 'required|date',
-        'status' => 'required|in:pending,paid,failed',
-        'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:12288',
-    ]);
+    /**
+     * Memperbarui data pembayaran
+     */
+    public function update(Request $request, Payment $payment)
+    {
+        $request->validate([
+            'reservation_id' => 'required|exists:reservations,id',
+            'amount'         => 'required|numeric|min:0',
+            'method'         => 'required|in:cash,transfer',
+            'payment_date'   => 'required|date',
+            'status'         => 'required|in:pending,paid,failed',
+            'payment_proof'  => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:12288',
+        ], [
+            'reservation_id.required' => 'Reservasi harus dipilih.',
+            'amount.required'         => 'Jumlah pembayaran wajib diisi.',
+            'method.required'         => 'Metode pembayaran wajib dipilih.',
+            'payment_date.required'   => 'Tanggal pembayaran wajib diisi.',
+            'status.required'         => 'Status pembayaran wajib dipilih.',
+            'payment_proof.mimes'     => 'Bukti pembayaran harus berupa file gambar atau PDF.',
+        ]);
 
-    $data = $request->all();
+        $data = $request->all();
 
-    // Upload bukti pembayaran jika ada
-    if ($request->hasFile('payment_proof')) {
-        // Hapus file lama jika ada
-        if ($payment->payment_proof && Storage::disk('public')->exists('payment_proofs/' . $payment->payment_proof)) {
-            Storage::disk('public')->delete('payment_proofs/' . $payment->payment_proof);
+        // Upload bukti pembayaran (jika ada)
+        if ($request->hasFile('payment_proof')) {
+
+            // Hapus file lama jika ada
+            if ($payment->payment_proof && Storage::disk('public')->exists('payment_proofs/' . $payment->payment_proof)) {
+                Storage::disk('public')->delete('payment_proofs/' . $payment->payment_proof);
+            }
+
+            $file = $request->file('payment_proof');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // Simpan file
+            $file->storeAs('payment_proofs', $filename, 'public');
+
+            $data['payment_proof'] = $filename;
         }
 
-        $file = $request->file('payment_proof');
-        $filename = time() . '_' . $file->getClientOriginalName();
+        $payment->update($data);
 
-        // Simpan file di disk public
-        $file->storeAs('payment_proofs', $filename, 'public');
-
-        $data['payment_proof'] = $filename;
+        return redirect()->route('payments.receipt', $payment->id)
+            ->with([
+                'message' => 'Data pembayaran berhasil diperbarui.',
+                'alert-type' => 'success'
+            ]);
     }
 
-    $payment->update($data);
-
-    // Redirect ke route receipt dengan parameter payment
-    return redirect()->route('payments.receipt', $payment->id)
-                     ->with([
-                        'message' => 'Data pembayaran berhasil diperbarui.',
-                        'alert-type' => 'success'
-                     ]);
-}
-
-
-
+    /**
+     * Menghapus pembayaran
+     */
     public function destroy(Payment $payment)
     {
-        // Hapus file bukti jika ada
+        // Hapus bukti pembayaran jika ada
         if ($payment->payment_proof && Storage::exists('public/payment_proofs/' . $payment->payment_proof)) {
             Storage::delete('public/payment_proofs/' . $payment->payment_proof);
         }
 
         $payment->delete();
-        return redirect()->route('payments.index')->with([
-                                                    'message' => 'Data pembayaran berhasil dihapus.',
-                                                    'alert-type' => 'success'
-                                                ]);
 
+        return redirect()->route('payments.index')->with([
+            'message' => 'Data pembayaran berhasil dihapus.',
+            'alert-type' => 'success'
+        ]);
     }
 
-public function receipt(Payment $payment)
-{
-    if (!$payment->reservation) {
+    /**
+     * Menampilkan struk pembayaran
+     */
+    public function receipt(Payment $payment)
+    {
+        if (!$payment->reservation) {
+            return redirect()->route('payments.index')
+                ->with([
+                    'message' => 'Pembayaran ini belum memiliki data reservasi!',
+                    'alert-type' => 'error'
+                ]);
+        }
+
+        return view('payments.receipt', compact('payment'));
+    }
+
+    /**
+     * Konfirmasi pembayaran
+     */
+    public function konfirmasi(Payment $payment)
+    {
+        // Set pembayaran menjadi "paid"
+        $payment->update(['status' => 'paid']);
+
+        $reservation = $payment->reservation;
+        $hall_id = $reservation->hall_id;
+
+        // Set reservasi menjadi "completed"
+        $reservation->update(['status' => 'completed']);
+
+        // Masukkan data ke tabel keuangan
+        Finance::create([
+            'type'           => 'income',
+            'description'    => 'Pembayaran untuk reservasi #' . $reservation->id,
+            'amount'         => $payment->amount,
+            'date'           => now(),
+            'reservation_id' => $reservation->id,
+        ]);
+
+        // Tandai gedung sebagai tidak tersedia
+        HallAvailability::create([
+            'hall_id'        => $hall_id,
+            'date'           => $reservation->event_start,
+            'date_end'       => $reservation->event_end,
+            'reservation_id' => $reservation->id,
+            'status'         => 'unavailable',
+            'note'           => 'Gedung digunakan oleh ' . $reservation->renter_name,
+        ]);
+
         return redirect()->route('payments.index')
             ->with([
-                'message' => 'Payment ini belum memiliki reservasi terkait!',
-                'alert-type' => 'error'
+                'message' => 'Pembayaran berhasil dikonfirmasi.',
+                'alert-type' => 'success'
             ]);
     }
-
-    return view('payments.receipt', compact('payment'));
-}
-
-
-
-
-    public function konfirmasi(Payment $payment)
-{
-    // Ubah status pembayaran menjadi 'paid'
-    $payment->update(['status' => 'paid']);
-
-    // Ambil data reservasi dari payment
-    $reservation = $payment->reservation;
-    $hall_id = $reservation->hall_id;
-
-    // Update status reservasi jadi 'completed'
-    $reservation->update(['status' => 'completed']);
-
-    // Tambahkan data ke tabel finances
-    Finance::create([
-        'type'           => 'income',
-        'description'    => 'Payment for reservation #' . $reservation->id,
-        'amount'         => $payment->amount,
-        'date'           => now(),
-        'reservation_id' => $reservation->id,
-    ]);
-
-    // Tandai hall sebagai unavailable
-    HallAvailability::create([
-        'hall_id'        => $hall_id,
-        'date'           => $reservation->event_start,
-        'date_end'           => $reservation->event_end,
-        'reservation_id' => $reservation->id,
-        'status'         => 'unavailable',
-        'note'           => 'Gedung disewa ' . $reservation->renter_name ,
-    ]);
-
-    return redirect()->route('payments.index')
-    ->with([
-        'message' => 'Pembayaran berhasil dikonfirmasi.',
-        'alert-type' => 'success'
-    ]);
-
-}
-
-
-
 }

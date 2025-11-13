@@ -8,92 +8,121 @@
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            <div class="bg-white shadow-lg rounded-xl overflow-hidden">
-                <div class="p-6 text-gray-900 overflow-x-auto">
-                    <table class="w-full border-collapse text-sm rounded-lg overflow-hidden">
-                        <thead>
-                            <tr class="bg-gradient-to-r from-orange-200 to-orange-300 text-gray-800">
-                                <th class="px-4 py-3 border text-center font-semibold">Penyewa</th>
-                                {{-- <th class="px-4 py-3 border text-center font-semibold">Hall</th> --}}
-                                <th class="px-4 py-3 border text-center font-semibold">Catering</th>
-                                <th class="px-4 py-3 border text-center font-semibold">Keterangan</th>
-                                <th class="px-4 py-3 border text-center font-semibold">Tanggal Sewa</th>
-                                <th class="px-4 py-3 border text-center font-semibold">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            @foreach($dates as $calendar)
-                                @php
-                                    $reservation = $calendar->reservation;
-                                @endphp
-                                <tr class="hover:bg-gray-50 transition">
-                                    <!-- Penyewa -->
-                                    <td class="px-4 py-3 border text-gray-700 text-center">
-                                        {{ optional($reservation)->renter_name ?? '-' }}
-                                    </td>
+            {{-- Grid Responsif untuk Card --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                                    {{-- <!-- Hall -->
-                                    <td class="px-4 py-3 border text-center font-semibold text-gray-800">
-                                        {{ $calendar->hall->name ?? '-' }}
-                                    </td> --}}
-                                    
-                                    <!-- Catering -->
-                                    <td class="px-4 py-3 border text-center">
-                                        @if($reservation && $reservation->services->isNotEmpty())
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 shadow-sm">
-                                            {{ $reservation->services->map(fn($s) => $s->name . ' x ' . $s->pivot->quantity)->implode(', ') }}
-                                        </span>
-                                        @elseif($reservation)
-                                        <span class="text-gray-500 italic">Tidak menggunakan catering</span>
-                                        @else
-                                        <span class="text-gray-400 italic">Tidak ada reservasi</span>
-                                        @endif
-                                    </td>
-                                    
-                                    <!-- Keterangan -->
-                                    <td class="px-4 py-3 border text-gray-600 text-center">
-                                        {{ $calendar->note ?? '-' }}
-                                    </td>
-                                    
-                                    <!-- Tanggal -->
-                                    <td class="px-4 py-3 border text-center text-gray-600">
-                                    @if($reservation)
-                                        {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }}
-                                            -
-                                        {{ \Carbon\Carbon::parse($reservation->event_end)->format('d M Y') }}
-                                     @else
-                                        <span class="italic text-gray-400">-</span>
-                                    @endif
-                                    </td>      
-                                                                            
-                                    <!-- Action -->
-                                    <td class="px-4 py-3 border text-center">
-                                        <form action="{{ route('calendar.destroy', $calendar->id) }}" 
-                                              method="POST" 
-                                              onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')"
-                                              class="inline-block">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" 
-                                                class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs shadow transition">
-                                                🗑️ Hapus
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            
-                            @if($dates->isEmpty())
-                                <tr>
-                                    <td colspan="6" class="px-4 py-6 text-center text-gray-500 italic">
-                                        Tidak ada jadwal gedung.
-                                    </td>
-                                </tr>
+                @forelse($dates as $calendar)
+                    @php
+                        $reservation = $calendar->reservation;
+                        $hasReservation = !is_null($reservation);
+                    @endphp
+
+                    {{-- Card Jadwal --}}
+                    <div class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col 
+                                transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+                        
+                        <div class="p-5 border-b {{ $hasReservation ? 'border-gray-100' : 'border-red-100 bg-red-50' }}">
+                            @if($hasReservation)
+                                <p class="text-xs text-gray-500">Penyewa</p>
+                                <h3 class="text-xl font-bold text-gray-900 truncate">
+                                    {{ $reservation->renter_name }}
+                                </h3>
+                            @else
+                                <h3 class="text-xl font-bold text-red-600 flex items-center gap-2">
+                                    <i data-feather="slash" class="w-5 h-5"></i>
+                                    Jadwal Diblokir
+                                </h3>
                             @endif
-                        </tbody>
-                    </table>
-                </div>
+                        </div>
+
+                        <div class="p-5 flex-grow space-y-5">
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase">Tanggal Mulai</label>
+                                    <p class="font-semibold text-gray-800">
+                                        @if($hasReservation)
+                                            {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }}
+                                        @else
+                                            <span class="italic text-gray-400">-</span>
+                                        @endif
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase">Tanggal Selesai</label>
+                                    <p class="font-semibold text-gray-800">
+                                        @if($hasReservation)
+                                            {{ \Carbon\Carbon::parse($reservation->event_end)->format('d M Y') }}
+                                        @else
+                                            <span class="italic text-gray-400">-</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase">Catering</label>
+                                <div class="mt-1">
+                                    @if($hasReservation && $reservation->services->isNotEmpty())
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 shadow-sm">
+                                        {{ $reservation->services->pluck('name')->implode(', ') }}
+                                    </span>
+                                    @elseif($hasReservation)
+                                    <span class="text-gray-500 italic text-sm">Tidak menggunakan catering</span>
+                                    @else
+                                    <span class="text-gray-400 italic text-sm">-</span>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase">Keterangan</label>
+                                <p class="text-gray-700 text-sm">
+                                    {{ $calendar->note ?? '-' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-4 mt-auto border-t border-gray-100">
+                            <div class="flex justify-end">
+                                <form action="{{ route('calendar.destroy', $calendar->id) }}" 
+                                      method="POST" 
+                                      onsubmit="return confirm('Yakin ingin menghapus jadwal ini?')"
+                                      class="inline-block">
+                                    @csrf @method('DELETE')
+                                    <button typef="submit" 
+                                            class="inline-flex items-center gap-1.5 bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1.5 rounded-md text-xs font-medium transition">
+                                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                @empty
+                    <div class="md:col-span-2 lg:col-span-3 bg-white shadow-lg rounded-xl p-12 text-center text-gray-500">
+                        <i data-feather="calendar" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-700">Tidak Ada Jadwal</h3>
+                        <p class="mt-2">Belum ada jadwal gedung yang terdaftar atau diblokir.</p>
+                    </div>
+                @endforelse
             </div>
+
+            {{-- Pagination (Jika Anda menambahkannya) --}}
+            {{-- <div class="mt-8">
+                {{ $dates->links() }}
+            </div> --}}
 
         </div>
     </div>
+    
+    {{-- Script untuk menjalankan Feather Icons --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                feather.replace();
+            });
+        </script>
+    @endpush
 </x-app-layout>

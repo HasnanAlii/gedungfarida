@@ -101,7 +101,7 @@
 <section id="fasilitas" class="bg-gradient-to-b from-orange-50 to-orange-100 py-16 md:py-20">
   <div class="max-w-6xl mx-auto px-4 md:px-6">
     <h3 class="text-2xl md:text-3xl font-bold mb-10 md:mb-12 text-center text-gray-800">
-      Fasilitas
+      FasilitasJalankan php artisan serve --host=0.0.0.0 --port=8000Fasilitas
     </h3>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-6">
