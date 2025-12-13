@@ -21,35 +21,40 @@
 
                 {{-- PERUBAHAN: Mengganti <table> dengan <div> list --}}
                 <div class="space-y-4">
-                    @forelse($dates as $calendar)
+                   @forelse($dates as $calendar)
                         @php
                             $reservation = $calendar->reservation;
+                            $isReservation = !is_null($calendar->reservation_id);
                         @endphp
-                        
-                        {{-- Card untuk setiap item jadwal --}}
+
                         <div class="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
-                            {{-- Ikon Status (Merah = Tidak Tersedia) --}}
-                            <div class="p-3 bg-red-100 rounded-lg mr-4">
-                                <i data-feather="slash" class="w-6 h-6 text-red-600"></i>
+                            {{-- IKON STATUS --}}
+                            <div class="p-3 rounded-lg mr-4
+                                {{ $isReservation ? 'bg-orange-100' : 'bg-red-100' }}">
+                                <i data-feather="{{ $isReservation ? 'calendar' : 'tool' }}"
+                                class="w-6 h-6 {{ $isReservation ? 'text-orange-600' : 'text-red-600' }}"></i>
                             </div>
-                            
-                            {{-- Info Tanggal --}}
-                            <div>
+
+                            {{-- INFO --}}
+                            <div class="flex-1">
                                 <p class="font-semibold text-gray-800 text-base md:text-lg">
-                                    @if($reservation)
-                                        {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }} – 
+                                    @if($isReservation)
+                                        {{ \Carbon\Carbon::parse($reservation->event_start)->format('d M Y') }}
+                                        –
                                         {{ \Carbon\Carbon::parse($reservation->event_end)->format('d M Y') }}
                                     @else
-                                        {{-- Ini untuk tanggal yang diblokir manual oleh admin --}}
-                                        <span class="text-gray-500">Tanggal Diblokir</span>
+                                        {{ \Carbon\Carbon::parse($calendar->date)->format('d M Y') }}
+                                        –
+                                        {{ \Carbon\Carbon::parse($calendar->date_end)->format('d M Y') }}
                                     @endif
                                 </p>
-                                <p class="text-sm text-red-700 font-medium">
-                                    Tidak Tersedia (Sudah Dipesan)
+
+                                <p class="text-sm font-medium
+                                    {{ $isReservation ? 'text-orange-700' : 'text-red-700' }}">
+                                    {{ $isReservation ? 'Tidak Tersedia (Sudah Dipesan)' : 'Tidak Tersedia (Maintenance / Diblokir)' }}
                                 </p>
                             </div>
                         </div>
-
                     @empty
                         {{-- PERUBAHAN: Empty state yang lebih positif --}}
                         <div class="flex flex-col items-center justify-center p-10 bg-green-50 rounded-lg border border-dashed border-green-300">

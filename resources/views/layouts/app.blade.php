@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Gedung Farida') }}</title>
-    <link rel.icon" href="{{ asset('assets/logo.png') }}?v=2" type="image/png">
+    <link rel="icon" href="{{ asset('assets/logo.png') }}?v=2" type="image/png">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -20,37 +20,33 @@
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {{-- Alpine JS --}}
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-
 </head>
 <style>
-    /* PERBAIKAN: 
-      - .nav-item: Dibuat lebih kontras (putih opacity 80%)
-      - .nav-item.active: 'color' diubah menjadi 'text-orange-600' agar terlihat
-    */
+    /* CSS Nav-Item Anda tetap dipertahankan */
     .nav-item {
         display: flex;
         align-items: center;
         padding: 0.75rem 1rem;
-        border-radius: 0.75rem; /* rounded-xl */
+        border-radius: 0.75rem; 
         font-weight: 500;
-        color: rgba(255, 255, 255, 0.8); /* Teks putih pudar */
+        color: rgba(255, 255, 255, 0.8); 
         transition: all 0.2s ease;
     }
     .nav-item:hover {
         background-color: rgba(255, 255, 255, 0.15);
-        color: white; /* Teks putih solid saat hover */
+        color: white; 
     }
     .nav-item.active {
         background-color: white;
-        color: #EA580C; /* PERBAIKAN: Ini adalah text-orange-600 */
-        font-weight: 600; /* Dibuat tebal */
+        color: #EA580C; 
+        font-weight: 600; 
     }
 
     /* Style untuk SweetAlert Error List */
@@ -61,89 +57,134 @@
     .swal-error-list li {
         margin-bottom: 0.5rem;
     }
+    
+    /* Tambahan agar scrollbar di sidebar lebih rapi (opsional) */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 4px;
+    }
 </style>
-<body class="font-sans antialiased bg-gray-100">
-    <div class="min-h-screen flex flex-col">
-        {{-- Navigation --}}
-        @include('layouts.navigation')
 
+<body class="font-sans antialiased bg-gray-100">
+
+<div x-data="{ sidebarOpen: false }" class="flex h-screen overflow-hidden">
+
+    {{-- MOBILE HEADER --}}
+    <div class="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-gray-100">
+        <div class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-2">
+                <x-application-logo class="h-8 w-8 text-orange-600" />
+                <span class="font-bold text-lg text-gray-800">Gedung Farida</span>
+            </div>
+            <button @click="sidebarOpen = true"
+                class="p-2 rounded-md text-gray-600 hover:text-orange-600 hover:bg-orange-50">
+                <i data-feather="menu"></i>
+            </button>
+        </div>
+    </div>
+
+    {{-- OVERLAY --}}
+    <div x-show="sidebarOpen"
+         @click="sidebarOpen = false"
+         x-transition
+         class="fixed inset-0 bg-black/50 z-40 lg:hidden">
+    </div>
+
+    {{-- SIDEBAR --}}
+    <nav
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100
+               transform transition-transform duration-300 lg:static lg:translate-x-0
+               flex flex-col">
+
+        {{-- Sidebar kamu (TIDAK diubah desainnya) --}}
+        @include('layouts.navigation')
+    </nav>
+
+    {{-- CONTENT --}}
+    <div class="flex-1 flex flex-col overflow-hidden ">
+
+        {{-- HEADER DESKTOP --}}
         @isset($header)
-            {{-- PERBAIKAN: Header dibuat lebih rapi dengan border --}}
-            <header class="bg-white shadow-sm border-b border-gray-200">
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center sm:text-left">
+            <header class="hidden lg:block bg-white border-b border-gray-200 sticky top-0 z-20">
+                <div class="px-6 py-4">
                     {{ $header }}
                 </div>
             </header>
         @endisset
 
-        {{-- PERBAIKAN: Padding ditambah agar tidak terlalu mepet --}}
-        <main class="flex-1 w-full bg-gradient-to-b from-gray-100 to-orange-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                {{ $slot }}
-            </div>
+        {{-- MAIN --}}
+        <main class="flex-1 overflow-y-auto bg-gray-100 p-6 mt-16 lg:mt-0">
+            {{ $slot }}
         </main>
 
-        <script>
-            // 1. Panggil saat DOM dimuat (halaman awal)
-            document.addEventListener("DOMContentLoaded", function() {
-                if (typeof feather !== 'undefined') {
-                    feather.replace();
-                }
-            });
-        
-            // 2. Panggil lagi setelah Alpine.js dimuat
-            document.addEventListener('alpine:init', () => {
-                // Panggil saat inisialisasi
-                if (typeof feather !== 'undefined') {
-                    feather.replace();
-                }
-        
-                // 3. Panggil setiap kali Alpine memperbarui DOM (paling penting)
-                Alpine.effect(() => {
-                    // $nextTick menunggu Alpine selesai melakukan perubahan DOM
-                    Alpine.nextTick(() => {
-                        if (typeof feather !== 'undefined') {
-                            feather.replace();
-                        }
-                    });
+    </div>
+
+</div>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    
+        document.addEventListener('alpine:init', () => {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+    
+            Alpine.effect(() => {
+                Alpine.nextTick(() => {
+                    if (typeof feather !== 'undefined') {
+                        feather.replace();
+                    }
                 });
             });
-        </script>
+        });
+    </script>
 
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 5000,
-                timerProgressBar: true
-            });
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true
+        });
 
-            @if(Session::has('message'))
-                var type = "{{ Session::get('alert-type', 'info') }}";
-                switch(type){
-                    case 'info':
-                        Toast.fire({ icon: 'info', title: "{{ Session::get('message') }}" }); break;
-                    case 'success':
-                        Toast.fire({ icon: 'success', title: "{{ Session::get('message') }}" }); break;
-                    case 'warning':
-                        Toast.fire({ icon: 'warning', title: "{{ Session::get('message') }}" }); break;
-                    case 'error':
-                        Toast.fire({ icon: 'error', title: "{{ Session::get('message') }}" }); break;
-                }
-            @endif
+        @if(Session::has('message'))
+            var type = "{{ Session::get('alert-type', 'info') }}";
+            switch(type){
+                case 'info':
+                    Toast.fire({ icon: 'info', title: "{{ Session::get('message') }}" }); break;
+                case 'success':
+                    Toast.fire({ icon: 'success', title: "{{ Session::get('message') }}" }); break;
+                case 'warning':
+                    Toast.fire({ icon: 'warning', title: "{{ Session::get('message') }}" }); break;
+                case 'error':
+                    Toast.fire({ icon: 'error', title: "{{ Session::get('message') }}" }); break;
+            }
+        @endif
 
-            @if ($errors->any())
-                let errors = `<ul class="swal-error-list">`;
-                @foreach ($errors->all() as $error)
-                    errors += `<li>{{ $error }}</li>`;
-                @endforeach
-                errors += `</ul>`;
-                Swal.fire({ icon: 'error', title: "Terjadi Kesalahan", html: errors });
-            @endif
-        </script>
-        
-        @stack('scripts')
-    </div>
+        @if ($errors->any())
+            let errors = `<ul class="swal-error-list">`;
+            @foreach ($errors->all() as $error)
+                errors += `<li>{{ $error }}</li>`;
+            @endforeach
+            errors += `</ul>`;
+            Swal.fire({ icon: 'error', title: "Terjadi Kesalahan", html: errors });
+        @endif
+    </script>
+    
+    @stack('scripts')
 </body>
 </html>

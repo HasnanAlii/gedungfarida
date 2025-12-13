@@ -43,36 +43,41 @@ class HallAvailabilitiesController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'hall_id' => 'required|exists:halls,id',
-            'date'    => 'required|date',
-            'status'  => 'required|in:available,unavailable',
-            'note'    => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'hall_id'   => 'required|exists:halls,id',
+            'date'      => 'required|date',
+            'date_end'  => 'nullable|date|after_or_equal:date',
+            'status'    => 'required|in:available,unavailable',
+            'note'      => 'nullable|string|max:255',
         ]);
 
         try {
-            HallAvailability::updateOrCreate(
-                [
-                    'hall_id' => $request->hall_id,
-                    'date'    => $request->date
-                ],
-                [
-                    'status' => $request->status,
-                    'note'   => $request->note,
-                ]
-            );
+            HallAvailability::create([
+                'hall_id'        => $validated['hall_id'],
+                'date'           => $validated['date'],
+                'date_end'       => $validated['date_end'] ?? $validated['date'],
+                'status'         => $validated['status'],
+                'note'           => $validated['note'],
+                'reservation_id' => null, // PENTING
+            ]);
 
-            return redirect()->route('calendar.index')->with([
-                'message' => 'Data ketersediaan gedung berhasil disimpan.',
-                'alert-type' => 'success'
-            ]);
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with([
-                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage(),
-                'alert-type' => 'error'
-            ]);
+            return redirect()
+                ->route('calendar.index')
+                ->with([
+                    'message' => 'Availability berhasil disimpan.',
+                    'alert-type' => 'success'
+                ]);
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withInput()
+                ->with([
+                    'message' => 'Gagal menyimpan availability.',
+                    'alert-type' => 'error'
+                ]);
         }
     }
+
 
     /**
      * Form untuk mengedit data ketersediaan gedung
