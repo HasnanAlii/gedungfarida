@@ -64,14 +64,56 @@
 
                     {{-- Metode Pembayaran --}}
                     <div class="mb-6">
-                        <label for="method" class="block font-semibold text-gray-700 mb-1">Metode Pembayaran</label>
+                        <label for="method" class="block font-semibold text-gray-700 mb-1">
+                            Metode Pembayaran
+                        </label>
                         <select name="method" id="method"
-                            class="w-full border-gray-300 border rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-orange-400 focus:border-orange-400">
+                            class="w-full border-gray-300 border rounded-xl px-4 py-2.5
+                                focus:ring-2 focus:ring-orange-400 focus:border-orange-400">
                             <option value="">-- Pilih Metode --</option>
                             <option value="cash" {{ $payment->method == 'cash' ? 'selected' : '' }}>Cash</option>
                             <option value="transfer" {{ $payment->method == 'transfer' ? 'selected' : '' }}>Transfer</option>
                         </select>
                     </div>
+
+                    {{-- INFO REKENING TUJUAN --}}
+                    <div id="rekeningTujuan" class="hidden mb-6">
+                        <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                            <p class="text-sm text-gray-600 mb-2">
+                                Silakan lakukan transfer ke rekening berikut:
+                            </p>
+
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Bank BCA</p>
+                                    <p class="text-lg font-bold text-orange-600">
+                                        1234567890
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        a.n. PT Contoh Sejahtera
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const method = document.getElementById('method');
+                        const rekeningTujuan = document.getElementById('rekeningTujuan');
+
+                        function toggleRekening() {
+                            if (method.value === 'transfer') {
+                                rekeningTujuan.classList.remove('hidden');
+                            } else {
+                                rekeningTujuan.classList.add('hidden');
+                            }
+                        }
+
+                        toggleRekening();
+                        method.addEventListener('change', toggleRekening);
+                    });
+                    </script>
+
 
                     {{-- Tanggal Pembayaran --}}
                     <div class="mb-6">

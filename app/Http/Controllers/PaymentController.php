@@ -22,7 +22,7 @@ class PaymentController extends Controller
         if ($user->hasRole('admin')) {
             // Admin: tampilkan semua pembayaran
             $payments = Payment::with('reservation.user')
-                ->orderBy('payment_date', 'desc')
+                ->orderBy('payment_date', 'asc')
                 ->paginate(10);
 
             return view('payments.index', compact('payments'));

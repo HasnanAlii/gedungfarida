@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    @hasrole('admin')
+                    {{-- @hasrole('admin') --}}
                     <div class="p-4 bg-gray-50 border-t border-b border-gray-100">
                         <h4 class="text-xs font-semibold text-gray-500 uppercase mb-2">Bukti Pembayaran</h4>
                         @if($payment->payment_proof)
@@ -93,7 +93,7 @@
                             <span class="text-gray-400 italic text-sm">- Belum ada bukti -</span>
                         @endif
                     </div>
-                    @endhasrole
+                    {{-- @endhasrole --}}
 
                     <div class="p-4 bg-gray-50 mt-auto">
                         <div class="flex flex-wrap justify-start gap-2">
@@ -121,13 +121,15 @@
                                 @endhasrole
                             @endif
 
-                            {{-- PERUBAHAN: Tombol Hapus dengan ikon --}}
+                             @hasrole('admin')
                             <form action="{{ route('payments.destroy', $payment->id) }}" method="POST" onsubmit="return confirm('Hapus pembayaran ini?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="flex items-center gap-1.5 bg-red-100 text-red-800 rounded-md px-3 py-1.5 text-xs font-medium hover:bg-red-200 transition">
                                     <i data-feather="trash-2" class="w-4 h-4"></i> Hapus
                                 </button>
                             </form>
+                              @endhasrole
+
                         </div>
                     </div>
                 </div>

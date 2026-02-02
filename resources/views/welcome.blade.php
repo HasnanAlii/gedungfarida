@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -304,10 +306,25 @@
                     <p class="text-gray-400 leading-relaxed mb-6">
                         Menyediakan tempat terbaik untuk momen berharga Anda. Kenyamanan dan kepuasan Anda adalah prioritas utama kami.
                     </p>
-                    <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-orange-600 transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-orange-600 transition"><i class="fab fa-facebook-f"></i></a>
-                    </div>
+
+                <div class="flex gap-4">
+                    <a href="https://instagram.com/username"
+                    target="_blank"
+                    class="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 
+                            flex items-center justify-center text-white 
+                            hover:scale-110 transition">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+
+                    <a href="https://wa.me/628123456789"
+                    target="_blank"
+                    class="w-10 h-10 rounded-full bg-green-500 
+                            flex items-center justify-center text-white 
+                            hover:bg-green-600 hover:scale-110 transition">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+
                 </div>
 
                 <div>

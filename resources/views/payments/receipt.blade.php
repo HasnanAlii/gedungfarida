@@ -69,7 +69,7 @@
 
                 <div class="flex flex-col-reverse sm:flex-row gap-3 justify-between mt-8 print:hidden">
                     {{-- Tombol Kembali (Sekunder) --}}
-                    <a href="{{ url()->previous() }}"
+                    <a href="{{ route('payments.index') }}"
                        class="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-5 py-2 rounded-xl text-sm font-medium shadow-sm transition">
                         <i data-feather="arrow-left" class="w-4 h-4"></i> Kembali
                     </a>
