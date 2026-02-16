@@ -57,6 +57,16 @@
                         Gedung
                     </a>
                 </li>
+                 <li>
+                    <a href="{{ route('galleries.index') }}"
+                       class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition
+                       {{ request()->routeIs('galleries.*')
+                           ? 'bg-orange-600 text-white shadow shadow-orange-200'
+                           : 'text-gray-600 hover:bg-orange-50 hover:text-orange-600' }}">
+                        <i data-feather="image" class="w-5 h-5"></i>
+                        Galery
+                    </a>
+                </li>
 
                 <li>
                     <a href="{{ route('services.index') }}"

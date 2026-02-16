@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Reservation;
 use App\Models\Payment;
 use App\Models\Finance;
+use App\Models\gallery;
+use App\Models\Hall;
 
 class DashboardController extends Controller
 {
@@ -26,5 +28,14 @@ class DashboardController extends Controller
                 'myPayments'     => Payment::whereHas('reservation', fn($q) => $q->where('user_id', $user->id))->get(),
             ]);
         }
+    }
+
+    public function welcome()
+    {
+        $galleries = gallery::all();
+        $halls = Hall::all();
+
+
+        return view('welcome', compact('galleries', 'halls'));
     }
 }
